@@ -4,6 +4,78 @@ require_once (dirname(__FILE__) . '/couchsimple.php');
 require_once (dirname(__FILE__) . '/api_utils.php');
 
 
+//--------------------------------------------------------------------------------------------------
+function country_species($country, $key, $callback = '')
+{
+	global $config;
+	global $couch;
+			
+	$startkey = json_decode($key);
+	array_unshift($startkey, $country);
+	
+	$endkey = $startkey;
+	$endkey[] = "zzz";
+		
+	$url = '_design/country/_view/species?startkey=' . urlencode(json_encode($startkey))
+		. '&endkey=' .  urlencode(json_encode($endkey))
+		. '&group_level=10';
+		
+		
+	if ($config['stale'])
+	{
+		$url .= '&stale=ok';
+	}	
+	
+	//echo urldecode($url);
+		
+	$resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" . $url);
+	
+	$response_obj = json_decode($resp);
+	
+	$obj = new stdclass;
+	$obj->status = 404;
+	$obj->url = $url;
+	
+	if (isset($response_obj->error))
+	{
+		$obj->error = $response_obj->error;
+	}
+	else
+	{
+		if (count($response_obj->rows) == 0)
+		{
+			$obj->error = 'Not found';
+		}
+		else
+		{	
+			$obj->status = 200;
+			$obj->counts = array();
+			
+			$obj->min_decade = 2020;
+			$obj->max_decade = 0;
+			
+			$obj->results = array();
+			$obj->results[] = array('EOL image','Species', 'Occurrences');
+			
+			foreach ($response_obj->rows as $row)
+			{
+				// Thumbnail (from EOL)
+				$summary = array('<img src="gbif_image.php?id=' . $row->key[8] . '" width="48" />');
+				
+				// Species name 				
+				$summary[] = '<a href="http://www.gbif.org/species/' . $row->key[8] . '" target="_new">' . $row->key[7] . '</a>';
+				
+				// Occurrence count
+				$summary[] = $row->value;
+
+				$obj->results[] = $summary;				
+			}
+					
+		}
+	}
+	
+	api_output($obj, $callback);
+}
 
 //--------------------------------------------------------------------------------------------------
 function country_publisher_decade($country, $callback = '')
@@ -410,7 +482,7 @@ function country_classification($country, $callback = '')
 		
 	$url = '_design/country/_view/classification?startkey=' . urlencode(json_encode($startkey))
 		. '&endkey=' .  urlencode(json_encode($endkey))
-		. '&group_level=4';
+		. '&group_level=5';
 		
 	if ($config['stale'])
 	{
@@ -867,6 +939,17 @@ function main()
 				}
 				
 			}
+			
+			if (!$handled)
+			{
+				if (isset($_GET['species']))
+				{	
+					country_species($country, $_GET['species'], $callback);
+					$handled = true;
+				}
+				
+			}
+			
 
 			
 			

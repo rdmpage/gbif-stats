@@ -36,6 +36,7 @@ if (isset($_GET['country']))
 		float:right;
 		width:400px;
 		font-size:12px;
+		overflow:auto;
       }
       
       #details {
@@ -134,8 +135,7 @@ if (isset($_GET['country']))
 							};
 					
 							var chart = new google.visualization.Table(document.getElementById('publisherDecade'));
-							chart.draw(data, options);							
-							
+							chart.draw(data, options);								
 						}
 					}
 				});
@@ -319,9 +319,94 @@ if (isset($_GET['country']))
 							  
 							  });
 							}
+							
+							//alert(JSON.stringify(data));
+							
+        					google.visualization.events.addListener(tree, 'select', 
+								function() {
+									var selection = tree.getSelection();
+									var item = selection[0];
+					
+									// construct a query 
+									
+									// Do this for terminal nodes only
+									if (data.getFormattedValue(item.row,2) != 0) {
+										var key = [];
+										
+										// Get path to root of tree
+										var key = [];
+										key.push(data.getFormattedValue(item.row,0));
+										
+										var ancestor = data.getFormattedValue(item.row,1);
+										
+										while (ancestor) {
+											key.unshift(ancestor);
+											
+											var f = null;
+											for (var i in d) {
+												if (d[i][0] == ancestor) {
+													f = d[i][1];
+													if (f == "Life") {
+														f = null;
+													}
+												}
+											}
+											
+											ancestor = f;
+										}
+										
+										// debugging
+										//key.push(data.getFormattedValue(item.row,2));
+										
+										//alert(JSON.stringify(key));
+										
+										show_species_list(country,key);
+
+									}
+					
+								});
+								
+							
+							
 						}
 					});
 	 }	
+	 
+      //--------------------------------------------------------------------------------------------
+      function show_species_list(country, path)
+      {
+			$("#list").html("");
+			$("#list").html('Loading...');
+			var url = "api.php?country=" + country + "&species=" + encodeURIComponent(JSON.stringify(path)) + "&callback=?";
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							var html = '';
+							
+							// chart
+							var d = data.results;
+							
+							
+							var data = google.visualization.arrayToDataTable(d	);
+
+							var options = {
+							  sortAscending: false,
+							  sortColumn: 2,
+							  height: 400,
+							  width: 620,
+							  allowHtml: true
+							};
+					
+							var chart = new google.visualization.Table(document.getElementById('list'));
+							chart.draw(data, options);								
+						}
+					}
+				});
+
+	 }	
+	 
 	 
     //--------------------------------------------------------------------------------------------
       function show_min_collection_dates(country)
@@ -531,13 +616,14 @@ if (isset($_GET['country']))
   </head>
   <body onload="$(window).resize()">
    	<div style="position:relative;">
- 	    <div id="details" style="overflow:auto;">
+ 	    <div id="details">
+ 	    	<div class="widget" id="classification"></div>
+ 	    	<div class="widget" id="identificationLevel"></div>
+ 	    	<div class="wide_widget" id="list"></div>
  	    	<div class="widget" id="collectionDate"></div>
  	    	<div class="widget" id="minCollectionDate"></div>
  	    	<div class="widget" id="basisOfRecord"></div>
- 	    	<div class="widget" id="classification"></div>
  	    	<div class="widget" id="hostCountry"></div>
- 	    	<div class="widget" id="identificationLevel"></div>
  	    	<div class="widget" id="vertical"></div>
  	    	<div class="widget" id="datePrecision"></div>
  	    	<div class="wide_widget" id="publisherDecade"></div>
