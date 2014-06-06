@@ -45,6 +45,18 @@
        "publishingOrgKey_decade": {
            "map": "function(doc) {\n  if (doc.countryCode && doc.publishingOrgKey && doc.year) {\n    var key = [];\n\n    key.push(doc.countryCode);    \n    key.push(doc.publishingOrgKey);\n    key.push(doc.institutionCode);\n \n    if (isNaN(doc.year)) {\n    } else {\n       var decade = Math.floor(doc.year/10) * 10;\n       key.push(decade);\n       emit(key, 1);\n    }\n  }\n}",
            "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "associatedSequences": {
+           "map": "function(doc) {\n  if (doc.countryCode) {\n    if (doc.associatedSequences) {\n      if (doc.associatedSequences.match(/Genbank:\\s+/)) {\n        var sequences = doc.associatedSequences;\n        sequences = sequences.replace(/Genbank:\\s+/, '');\n        var accessions = sequences.split(';');\n        for (var i in accessions) {\n           emit([doc.countryCode,accessions[i].trim()], 1);\n        }\n      }\n    }\n    // Datasets that are actually sequences\n    // EMBL Australia\n    if (doc.datasetKey == 'c1fc2df7-223b-4472-8998-70afb3b749ab') {\n     emit([doc.countryCode,doc.catalogNumber], 1);\n    }\n  }\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "species": {
+           "map": "function(doc) {\n  if (doc.countryCode && doc.speciesKey) {\n  var key = [];\n\n  key.push(doc.countryCode);    \n    if (doc.kingdom) {\n     key.push(doc.kingdom);\n    }\n    if (doc.phylum) {\n     key.push(doc.phylum);\n    }\n    if (doc.class) {\n     key.push(doc.class);\n    }\n    if (doc.order) {\n     key.push(doc.order);\n    }\n    if (doc.family) {\n     key.push(doc.family);\n    }\n    if (doc.genus) {\n     key.push(doc.genus);\n    }\n\n    // For reasons that surpass understanding species names can be different for same\n    // species, e.g occurrences 543471611 and 483375264 so we need to use scientificName\n    if (doc.species) {\n      key.push(doc.scientificName);\n     }\n    \n    // id (output taxonKey so we handle case where it's a subspecies\n    // new\n    if (doc.taxonKey) {\n      key.push(doc.taxonKey);\n    }\n    emit(key, 1);\n  }\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "issues": {
+           "map": "function(doc) {\n  if (doc.countryCode) {\n    for (var i in doc.issues) {\n      var key = [];\n      key.push(doc.countryCode);\n      key.push(doc.issues[i]);\n      emit(key, 1);\n    }\n  }\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
        }
    }
 }
