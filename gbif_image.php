@@ -17,7 +17,8 @@ $json = get($url);
 
 $obj = json_decode($json);
 
-$filename = 'images/eol.jpg';
+// No image
+$filename = 'images/blank.jpg';
 
 //print_r($obj);
 if (isset($obj[0]->eol_page_id))
@@ -26,7 +27,7 @@ if (isset($obj[0]->eol_page_id))
 	
 	if (!file_exists($filename))
 	{
-		// reset default filename 
+		// set default filename (in EOL but no image)
 		$filename = 'images/eol.jpg';
 
 		// fetch details
