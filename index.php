@@ -311,7 +311,7 @@ if (isset($_GET['country']))
 							var data = google.visualization.arrayToDataTable(d);
 							
 							var options = {
-								  title: 'Types status',
+								  title: 'Type status',
 								  pieHole: 0.4,
 								  pieSliceText: 'value'
 								};	
