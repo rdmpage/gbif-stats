@@ -460,7 +460,7 @@ if (isset($_GET['country']))
 
 							var options = {
 							  title: 'Cumulative addition of taxa',
-							  legend: { position: 'none'}
+							  legend: { position: 'none'},
 							  hAxis: { title : 'Year' },
 							  vAxis: { title : 'Cumulative number of taxa' }
 							};
@@ -495,7 +495,7 @@ if (isset($_GET['country']))
 
 							var options = {
 							  title: 'Collection elevation/depth',
-							  legend: { position: 'none'}
+							  legend: { position: 'none'},
 							  hAxis: { title : 'Number of occurrences' },
 							  vAxis: { title : 'Elevation/depth (m)' } 
 							};
