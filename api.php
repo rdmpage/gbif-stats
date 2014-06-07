@@ -59,11 +59,16 @@ function country_species($country, $key, $callback = '')
 			
 			foreach ($response_obj->rows as $row)
 			{
+				// If a taxon is missing an ancestor at one or more ranks then it will 
+				// have diefrent indices for the name and taxonKey fields, so we compute these
+				// individually
+				$n = count($row->key);
+				
 				// Thumbnail (from EOL)
-				$summary = array('<img src="gbif_image.php?id=' . $row->key[8] . '" width="48" />');
+				$summary = array('<img src="gbif_image.php?id=' . $row->key[$n - 1] . '" width="48" />');
 				
 				// Species name 				
-				$summary[] = '<a href="http://www.gbif.org/species/' . $row->key[8] . '" target="_new">' . $row->key[7] . '</a>';
+				$summary[] = '<a href="http://www.gbif.org/species/' . $row->key[$n - 1] . '" target="_new">' . $row->key[$n - 2] . '</a>';
 				
 				// Occurrence count
 				$summary[] = $row->value;
