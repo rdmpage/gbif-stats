@@ -162,7 +162,10 @@ if (isset($_GET['country']))
 
 							var options = {
 							  title: 'Collection dates',
-							  legend: { position: 'none'}
+							  legend: { position: 'none'},
+							  hAxis: { title : 'Year' },
+							  vAxis: { title : 'Number of occurrences' }
+							  
 							};
 					
 							var chart = new google.visualization.AreaChart(document.getElementById('collectionDate'));
@@ -458,6 +461,8 @@ if (isset($_GET['country']))
 							var options = {
 							  title: 'Cumulative addition of taxa',
 							  legend: { position: 'none'}
+							  hAxis: { title : 'Year' },
+							  vAxis: { title : 'Cumulative number of taxa' }
 							};
 					
 							var chart = new google.visualization.AreaChart(document.getElementById('minCollectionDate'));
@@ -489,8 +494,10 @@ if (isset($_GET['country']))
 							var data = google.visualization.arrayToDataTable(d	);
 
 							var options = {
-							  title: 'Collection altitude/depth',
+							  title: 'Collection elevation/depth',
 							  legend: { position: 'none'}
+							  hAxis: { title : 'Number of occurrences' },
+							  vAxis: { title : 'Elevation/depth (m)' } 
 							};
 					
 							var chart = new google.visualization.BarChart(document.getElementById('vertical'));
@@ -522,7 +529,8 @@ if (isset($_GET['country']))
 							var options = {
 							  title: 'Type shelflife',
 							  legend: { position: 'none'},
-							  hAxis: { title : 'Shelf' }
+							  hAxis: { title : 'Years between collection and typification' },
+							  vAxis: { title : 'Number of occurrences' }
 							};
 					
 							var chart = new google.visualization.AreaChart(document.getElementById('typeshelflife'));
