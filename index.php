@@ -289,6 +289,36 @@ if (isset($_GET['country']))
 						}
 					});
 	 }		
+
+      //--------------------------------------------------------------------------------------------
+      function show_typestatus(country)
+      {
+			$("#basisOfRecord").html("");
+			var url = "api.php?country=" + country + "&typestatus&callback=?";
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							var html = '';
+							
+							// chart
+							var d = data.results;
+														
+							var data = google.visualization.arrayToDataTable(d);
+							
+							var options = {
+								  title: 'Types status',
+								  pieHole: 0.4,
+								  pieSliceText: 'value'
+								};	
+								
+							var chart = new google.visualization.PieChart(document.getElementById('typestatus'));
+							chart.draw(data, options);
+							}
+						}
+					});
+	 }		
 	 
       //--------------------------------------------------------------------------------------------
       function show_classification(country)
@@ -471,6 +501,37 @@ if (isset($_GET['country']))
 				});
 	 }		
 
+	  //--------------------------------------------------------------------------------------------
+      function show_type_shelflife(country)
+      {
+			$("#vertical").html("");
+			var url = "api.php?country=" + country + "&typeshelflife&callback=?";
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							var html = '';
+							
+							// chart
+							var d = data.results;
+							
+							
+							var data = google.visualization.arrayToDataTable(d	);
+
+							var options = {
+							  title: 'Type shelflife',
+							  legend: { position: 'none'},
+							  hAxis: { title : 'Shelf' }
+							};
+					
+							var chart = new google.visualization.AreaChart(document.getElementById('typeshelflife'));
+							chart.draw(data, options);														
+						}
+					}
+				});
+	 }		
+
 	 
  		  
 		  
@@ -609,6 +670,8 @@ if (isset($_GET['country']))
 		show_date_precision(country);
 		show_vertical(country);
 		show_publisher_decade(country);
+		show_typestatus(country);
+		show_type_shelflife(country);
 	
       }
       
@@ -626,6 +689,8 @@ if (isset($_GET['country']))
  	    	<div class="widget" id="hostCountry"></div>
  	    	<div class="widget" id="vertical"></div>
  	    	<div class="widget" id="datePrecision"></div>
+ 	    	<div class="widget" id="typestatus"></div>
+ 	    	<div class="widget" id="typeshelflife"></div>
  	    	<div class="wide_widget" id="publisherDecade"></div>
  	    </div>
    		<div id="map"></div>

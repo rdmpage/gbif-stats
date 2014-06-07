@@ -357,8 +357,7 @@ function country_basis_of_record($country, $callback = '')
 {
 	global $config;
 	global $couch;
-		
-		
+	
 	$startkey = array($country);
 	$endkey = array($country, "zzz");
 		
@@ -403,6 +402,128 @@ function country_basis_of_record($country, $callback = '')
 	
 	api_output($obj, $callback);
 }
+
+//--------------------------------------------------------------------------------------------------
+function country_typestatus($country, $callback = '')
+{
+	global $config;
+	global $couch;
+		
+		
+	$startkey = array($country);
+	$endkey = array($country, "zzz");
+		
+	$url = '_design/country/_view/typeStatus?startkey=' . urlencode(json_encode($startkey))
+		. '&endkey=' .  urlencode(json_encode($endkey))
+		. '&group_level=2';
+		
+	if ($config['stale'])
+	{
+		$url .= '&stale=ok';
+	}	
+		
+	$resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" . $url);
+	
+	$response_obj = json_decode($resp);
+	
+	$obj = new stdclass;
+	$obj->status = 404;
+	$obj->url = $url;
+	
+	if (isset($response_obj->error))
+	{
+		$obj->error = $response_obj->error;
+	}
+	else
+	{
+		if (count($response_obj->rows) == 0)
+		{
+			$obj->error = 'Not found';
+		}
+		else
+		{	
+			$obj->status = 200;
+			$obj->results = array();
+			$obj->results[] = array('Type', 'Count');
+			foreach ($response_obj->rows as $row)
+			{
+				$obj->results[] = array((string)$row->key[1], $row->value);
+			}
+		}
+	}
+	
+	api_output($obj, $callback);
+}
+
+
+//--------------------------------------------------------------------------------------------------
+function country_type_shelflife($country, $callback = '')
+{
+	global $config;
+	global $couch;
+		
+		
+	$startkey = array($country);
+	$endkey = array($country, "zzz");
+		
+	$url = '_design/country/_view/holotype_shelflife?startkey=' . urlencode(json_encode($startkey))
+		. '&endkey=' .  urlencode(json_encode($endkey))
+		. '&group_level=2';
+		
+	if ($config['stale'])
+	{
+		$url .= '&stale=ok';
+	}	
+		
+	$resp = $couch->send("GET", "/" . $config['couchdb_options']['database'] . "/" . $url);
+	
+	$response_obj = json_decode($resp);
+	
+	$obj = new stdclass;
+	$obj->status = 404;
+	$obj->url = $url;
+	
+	if (isset($response_obj->error))
+	{
+		$obj->error = $response_obj->error;
+	}
+	else
+	{
+		if (count($response_obj->rows) == 0)
+		{
+			$obj->error = 'Not found';
+		}
+		else
+		{	
+			$obj->status = 200;
+			$obj->results = array();
+			$obj->results[] = array('Year', 'Count');
+			
+			// hack for cases where there's only one value
+			if (count($response_obj->rows) == 1)
+			{
+				$year = $response_obj->rows[0]->key[1];
+				$obj->results[] = array((string)($year-1), 0);
+			}
+			
+			foreach ($response_obj->rows as $row)
+			{
+				$obj->results[] = array((string)$row->key[1], $row->value);
+			}
+			
+			// hack for cases where there's only one value
+			if (count($response_obj->rows) == 1)
+			{
+				$year = $response_obj->rows[0]->key[1];
+				$obj->results[] = array((string)($year+1), 0);
+			}
+		}
+	}
+	
+	api_output($obj, $callback);
+}
+
+
 
 
 
@@ -950,6 +1071,26 @@ function main()
 				if (isset($_GET['species']))
 				{	
 					country_species($country, $_GET['species'], $callback);
+					$handled = true;
+				}
+				
+			}
+
+			if (!$handled)
+			{
+				if (isset($_GET['typestatus']))
+				{	
+					country_typestatus($country, $callback);
+					$handled = true;
+				}
+				
+			}
+
+			if (!$handled)
+			{
+				if (isset($_GET['typeshelflife']))
+				{	
+					country_type_shelflife($country, $callback);
 					$handled = true;
 				}
 				
