@@ -296,7 +296,7 @@ if (isset($_GET['country']))
       //--------------------------------------------------------------------------------------------
       function show_typestatus(country)
       {
-			$("#basisOfRecord").html("");
+			$("#typestatus").html("");
 			var url = "api.php?country=" + country + "&typestatus&callback=?";
 			
 			$.getJSON(url,
@@ -317,6 +317,36 @@ if (isset($_GET['country']))
 								};	
 								
 							var chart = new google.visualization.PieChart(document.getElementById('typestatus'));
+							chart.draw(data, options);
+							}
+						}
+					});
+	 }		
+
+      //--------------------------------------------------------------------------------------------
+      function show_issues(country)
+      {
+			$("#issues").html("");
+			var url = "api.php?country=" + country + "&issues&callback=?";
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							var html = '';
+							
+							// chart
+							var d = data.results;
+														
+							var data = google.visualization.arrayToDataTable(d);
+							
+							var options = {
+								  title: 'Issues',
+								  pieHole: 0.4,
+								  pieSliceText: 'value'
+								};	
+								
+							var chart = new google.visualization.PieChart(document.getElementById('issues'));
 							chart.draw(data, options);
 							}
 						}
@@ -680,6 +710,7 @@ if (isset($_GET['country']))
 		show_publisher_decade(country);
 		show_typestatus(country);
 		show_type_shelflife(country);
+		show_issues(country);
 	
       }
       
@@ -699,6 +730,8 @@ if (isset($_GET['country']))
  	    	<div class="widget" id="datePrecision"></div>
  	    	<div class="widget" id="typestatus"></div>
  	    	<div class="widget" id="typeshelflife"></div>
+ 	    	<div class="widget" id="issues"></div>
+ 	    	<div class="widget" id="blank"></div>
  	    	<div class="wide_widget" id="publisherDecade"></div>
  	    </div>
    		<div id="map"></div>
