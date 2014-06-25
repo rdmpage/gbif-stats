@@ -57,6 +57,18 @@
        "issues": {
            "map": "function(doc) {\n  if (doc.countryCode) {\n    for (var i in doc.issues) {\n      var key = [];\n      key.push(doc.countryCode);\n      key.push(doc.issues[i]);\n      emit(key, 1);\n    }\n  }\n}",
            "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "typeStatus": {
+           "map": "function(doc) {\n  if (doc.countryCode && doc.typeStatus) {\n    emit([doc.countryCode,doc.typeStatus], 1);\n  }\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "holotype_shelflife": {
+           "map": "function(doc) {\n  // Compte different in time (years) between date of name and date of collection\n  // for holotypes\n  if (doc.countryCode && doc.scientificName && doc.year && doc.typeStatus) {\n\n    if (doc.typeStatus == 'HOLOTYPE') {\n      var pattern = /([0-9]{4})\\)?$/;\n \n      var matches = doc.scientificName.match(pattern);\n      if (matches) {\n        var name_year = matches[1];\n        var difference = doc.year - name_year;\n        emit([doc.countryCode,difference], 1);\n        }\n    }\n  }\n\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
+       },
+       "shelflife": {
+           "map": "function(doc) {\n  // Compte different in time (years) between date of name and date of collection\n  if (doc.countryCode && doc.scientificName && doc.year && doc.typeStatus) {\n\n    if (doc.typeStatus == 'HOLOTYPE') {\n      var pattern = /([0-9]{4})\\)?$/;\n \n      var matches = doc.scientificName.match(pattern);\n      if (matches) {\n        var name_year = matches[1];\n        var difference = doc.year - name_year;\n        emit([doc.countryCode,difference], 1);\n        }\n    }\n  }\n\n}",
+           "reduce": "function (key, values, rereduce) {\n    return sum(values);\n}"
        }
    }
 }
