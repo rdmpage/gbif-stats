@@ -49,10 +49,6 @@ function country_species($country, $key, $callback = '')
 		else
 		{	
 			$obj->status = 200;
-			$obj->counts = array();
-			
-			$obj->min_decade = 2020;
-			$obj->max_decade = 0;
 			
 			$obj->results = array();
 			$obj->results[] = array('EOL image','Species', 'Occurrences');
@@ -60,7 +56,7 @@ function country_species($country, $key, $callback = '')
 			foreach ($response_obj->rows as $row)
 			{
 				// If a taxon is missing an ancestor at one or more ranks then it will 
-				// have diefrent indices for the name and taxonKey fields, so we compute these
+				// have different indices for the name and taxonKey fields, so we compute these
 				// individually
 				$n = count($row->key);
 				
