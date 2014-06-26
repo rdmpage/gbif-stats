@@ -638,14 +638,100 @@ if (isset($_GET['country']))
 			   marker = null;
 			}
 			
-			/*
+			
   			 marker = new google.maps.Marker({
       			position: position,
       			map: map
   			});
-  			*/
+  			
 		
 			// handle hit here...
+			$('#list').html('');
+			
+			$('#list').html('Loading...');
+			
+			// http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+			// Compute the tile the user has clicked on, and the relative position of the click
+			// within that tile
+			var tile_size = 256;
+			var pixels = 4;
+			var zoom = map.getZoom();
+			
+			var x_pos = (parseFloat(position.lng()) + 180)/360 * Math.pow(2, zoom);
+			var x = Math.floor(x_pos);
+			
+			// position within tile
+			var relative_x = Math.round(tile_size * (x_pos - x));
+		
+			var y_pos = (1-Math.log(Math.tan(parseFloat (position.lat())*Math.PI/180) + 1/Math.cos(parseFloat(position.lat())*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom);
+			var y = Math.floor(y_pos);
+			
+			// position within tile
+			var relative_y = Math.round(tile_size * (y_pos - y));
+		
+			// cluster into square defined by pixel size
+			relative_x = Math.floor(relative_x / pixels) * pixels;
+		    relative_y = Math.floor(relative_y / pixels) * pixels;
+			
+			var url = "couchtilehit.php"
+				+ "?x=" + x
+				+ "&y=" + y
+				+ "&z=" + zoom
+				+ "&rx=" + relative_x
+				+ "&ry=" + relative_y
+				+ "&countryCode=" + country
+				+ "&callback=?";
+				
+			//alert(url);
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							/*
+							var html = '';
+							
+							html += '<div>' + '<b>Number of occurrences: ' + data.results.length + '</b>' + '</div>';
+							
+							html += '<span class="explain">Tile [x,y,z,rx,ry] = [' + x + ',' + y + ',' + zoom + ',' + relative_x + ',' + relative_y + ']</span>';
+							
+							for (var i in data.results) {
+							   html += '<div>';
+							   html += data.results[i]._id + ' ';
+							   html += '</div>';
+							   
+							}
+							
+							$('#list').html(html);
+							*/
+							
+							var html = '';
+							
+							// chart
+							var d = data.results;
+							
+							
+							var data = google.visualization.arrayToDataTable(d	);
+
+							var options = {
+							  sortAscending: false,
+							  sortColumn: 2,
+							  height: 400,
+							  width: 620,
+							  allowHtml: true
+							};
+					
+							var chart = new google.visualization.Table(document.getElementById('list'));
+							chart.draw(data, options);								
+							
+							
+							
+						} else {
+						    $('#list').html('No occurrences here (try clicking again)');
+						}
+						
+					}
+				});			
 
 		}
 
