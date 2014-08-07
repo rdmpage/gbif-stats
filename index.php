@@ -262,6 +262,35 @@ if (isset($_GET['country']))
 						}
 					});
 	 }		
+
+      //--------------------------------------------------------------------------------------------
+      function show_spatial_precision(country)
+      {
+			$("#identificationLevel").html("");
+			var url = "api.php?country=" + country + "&spatial_precision&callback=?";
+			
+			$.getJSON(url,
+				function(data){
+					if (data.status == 200) {
+						if (data.results.length != 0) {
+							var html = '';
+							
+							// chart
+							var d = data.results;
+														
+							var data = google.visualization.arrayToDataTable(d);
+							
+							var options = {
+								  title: 'Spatial precision',
+								  pieHole: 0.4,
+								};	
+								
+							var chart = new google.visualization.PieChart(document.getElementById('spatialPrecision'));
+							chart.draw(data, options);
+							}
+						}
+					});
+	 }		
 	 
 	 
       //--------------------------------------------------------------------------------------------
@@ -797,6 +826,7 @@ if (isset($_GET['country']))
 		show_typestatus(country);
 		show_type_shelflife(country);
 		show_issues(country);
+		show_spatial_precision(country);
 	
       }
       
@@ -817,7 +847,7 @@ if (isset($_GET['country']))
  	    	<div class="widget" id="typestatus"></div>
  	    	<div class="widget" id="typeshelflife"></div>
  	    	<div class="widget" id="issues"></div>
- 	    	<div class="widget" id="blank"></div>
+ 	    	<div class="widget" id="spatialPrecision"></div>
  	    	<div class="wide_widget" id="publisherDecade"></div>
  	    </div>
    		<div id="map"></div>
